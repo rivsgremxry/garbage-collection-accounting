@@ -18,35 +18,33 @@ class Worker:
         self.image = self.add_image(image)
         self.is_admin = is_admin
 
-    @classmethod
-    def _is_valid_name(self, name):
-        valid_name = bool(re.search(r'\d', name))
-        if (valid_name != False):
-            raise ValueError("Validation Error: Name must contain text only")
-        else:
-            return name
+    @staticmethod
+    def _is_valid_name(name):
+        if not name.isalpha():
+            print("Validation error: Name should only contain alphabetic characters.")
+            return None
+        return name
 
     def _is_valid_birth_year(self, birth_year):
-        valid_birth_year = int(birth_year)
-        if (valid_birth_year < 0):
-            valid_birth_year = 2000
-        else:
-            return birth_year
+        try:
+            birth_year = int(birth_year)
+            if birth_year <= 0:
+                birth_year = 2000
+        except ValueError:
+            birth_year = 2000
+        return birth_year
 
     def _is_valid_email(self, email):
-        regex = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
-        if not re.match(regex, email):
-            return email + "@gmail.com"
+        if '@' not in email:
+            email += '@gmail.com'
         return email
 
-    def _is_valid_mobile_number(self, mobile_number):
+    @staticmethod
+    def _is_valid_mobile_number(mobile_number):
         return re.sub("\D", "", mobile_number)
 
     def full_name(self):
         print(f'[+] <{self.name} {self.surname}>{self.email}\n')
-
-    def test(self):
-        print(self.image)
 
     def add_image(self, image_name):
         file_extension = pathlib.Path(image_name).suffix
@@ -59,10 +57,8 @@ class Worker:
             raise ValueError("The image must not have the .jpg extension.")
 
     def save_image(self):
-        image_64_decode = base64.b64decode(self.image)
-        # create a writable image and write the decoding result
-        image_result = open('foto.jpg', 'wb')
-        image_result.write(image_64_decode)
+        with open("foto.jpg", "wb") as f:
+            f.write(base64.b64decode(self.image))
 
 
 class Accounting:
